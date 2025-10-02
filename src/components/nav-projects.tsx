@@ -16,12 +16,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
 
@@ -38,7 +46,7 @@ export function NavProjects({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -77,12 +85,34 @@ export function NavProjects({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        <Collapsible asChild className="group/collapsible">
+          <SidebarMenuItem>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton>
+                <MoreHorizontal className="text-sidebar-foreground/70" />
+                <span>More</span>
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarMenuSub>
+                <SidebarMenuSubItem>
+                  <SidebarMenuSubButton asChild>
+                    <a href="/dashboard/more/verify-codes">
+                      <span>Verify Codes</span>
+                    </a>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+                <SidebarMenuSubItem>
+                  <SidebarMenuSubButton asChild>
+                    <a href="/dashboard/more/import-codes">
+                      <span>Import Codes</span>
+                    </a>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </SidebarMenuItem>
+        </Collapsible>
       </SidebarMenu>
     </SidebarGroup>
   )
