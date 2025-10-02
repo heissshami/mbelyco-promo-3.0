@@ -35,7 +35,7 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "MBELYCO Promo 3.0",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
