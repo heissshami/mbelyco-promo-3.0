@@ -5,6 +5,7 @@ import {
   Forward,
   MoreHorizontal,
   Trash2,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react"
 
@@ -91,6 +92,7 @@ export function NavProjects({
               <SidebarMenuButton>
                 <MoreHorizontal className="text-sidebar-foreground/70" />
                 <span>More</span>
+                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
               </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent>

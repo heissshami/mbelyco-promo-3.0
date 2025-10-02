@@ -1,7 +1,18 @@
 "use client"
 
 import * as React from "react"
-import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react"
+import {
+  AudioWaveform,
+  Command,
+  GalleryVerticalEnd,
+  LayoutDashboard,
+  Layers,
+  Ticket,
+  BadgeCheck,
+  ShieldAlert,
+  Users as UsersIcon,
+  Settings as SettingsIcon,
+} from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -40,13 +51,13 @@ const data = {
     },
   ],
   navMain: [
-    { title: "Dashbold", url: "/dashboard" },
-    { title: "Batches", url: "/dashboard/batches" },
-    { title: "Promo Codes", url: "/dashboard/promo-codes" },
-    { title: "Redemptions", url: "/dashboard/redemptions" },
-    { title: "Frauds", url: "/dashboard/frauds" },
-    { title: "Users", url: "/dashboard/users" },
-    { title: "Settings", url: "/dashboard/settings" },
+    { title: "Dashbold", url: "/dashboard", icon: LayoutDashboard },
+    { title: "Batches", url: "/dashboard/batches", icon: Layers },
+    { title: "Promo Codes", url: "/dashboard/promo-codes", icon: Ticket },
+    { title: "Redemptions", url: "/dashboard/redemptions", icon: BadgeCheck },
+    { title: "Frauds", url: "/dashboard/frauds", icon: ShieldAlert },
+    { title: "Users", url: "/dashboard/users", icon: UsersIcon },
+    { title: "Settings", url: "/dashboard/settings", icon: SettingsIcon },
   ],
   projects: [
     {
