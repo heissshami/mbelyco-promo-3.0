@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSessionCookie } from "better-auth/cookies"
-import { auth } from "@/lib/auth"
 
 // Basic RBAC: restrict access to admin-only routes under /dashboard/settings
 const adminMatchers = [/^\/dashboard\/settings(\/.*)?$/]
 
 export async function middleware(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request)
   const url = new URL(request.url)
+  const sessionCookie = request.cookies.get("better-auth.session_token")?.value
 
   // Allow public paths
   const publicPaths = ["/", "/login", "/api/auth"]
@@ -24,9 +22,10 @@ export async function middleware(request: NextRequest) {
 
   // Admin check: fetch the session via API to inspect user role
   if (adminMatchers.some((re) => re.test(url.pathname))) {
-    // We use Better Auth API endpoint to validate role server-side
+    // We call the Better Auth session endpoint via fetch in the Edge runtime
     try {
-      const res = await auth.api.session({
+      const origin = url.origin
+      const res = await fetch(`${origin}/api/auth/session`, {
         headers: { cookie: request.headers.get("cookie") ?? "" },
       })
       if (!res.ok) return NextResponse.redirect(new URL("/login", request.url))
