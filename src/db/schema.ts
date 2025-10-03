@@ -109,3 +109,20 @@ export const promoCode = pgTable(
     batchIdx: index("promo_code_batch_idx").on(table.batchId),
   })
 )
+
+// Legacy promo codes table: supports existing data in older deployments
+export const legacyPromoCode = pgTable(
+  "promo_codes",
+  {
+    id: text("id").primaryKey(),
+    code: text("code").notNull(),
+    // Most legacy schemas used "batch_id"; if absent, queries will fail and fallback logic will avoid use
+    batchId: text("batch_id"),
+    status: text("status"), // expected legacy statuses: active | used | redeemed | expired | blocked
+    metadata: text("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: false }),
+    updatedAt: timestamp("updated_at", { withTimezone: false }),
+    redeemedAt: timestamp("redeemed_at", { withTimezone: false }),
+    verifiedAt: timestamp("verified_at", { withTimezone: false }),
+  }
+)
