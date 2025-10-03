@@ -63,13 +63,23 @@ const appData = {
   projects: [
     {
       name: "Generate Codes",
-      url: "/dashboard/actions/generate-codes",
+      url: "/dashboard/generate",
       icon: GalleryVerticalEnd,
     },
     {
       name: "Download Codes",
-      url: "/dashboard/actions/download-codes",
+      url: "/dashboard/download",
       icon: AudioWaveform,
+    },
+    {
+      name: "Import Codes",
+      url: "/dashboard/import",
+      icon: Command,
+    },
+    {
+      name: "Verify Codes",
+      url: "/dashboard/verify",
+      icon: BadgeCheck,
     },
   ],
 }

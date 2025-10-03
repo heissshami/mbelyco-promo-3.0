@@ -1,0 +1,65 @@
+import { db } from "@/db"
+import { batch, promoCode } from "@/db/schema"
+import { createWorker } from "@/lib/queue"
+import { generateCode, normalizePrefix } from "@/lib/promo"
+import { eq } from "drizzle-orm"
+import crypto from "crypto"
+
+type GenerateJob = {
+  name: string
+  prefix: string
+  length: number
+  count: number
+  expiresAt?: string | null
+  metadata?: string | null
+}
+
+declare global {
+  var __promo_generate_worker__: boolean | undefined
+}
+
+export function ensureGenerateWorker() {
+  if (globalThis.__promo_generate_worker__) return
+  const { worker } = createWorker<GenerateJob>(
+    "generate",
+    async (job) => {
+      const data = job.data
+      const name = data.name?.trim() || `Batch ${new Date().toISOString()}`
+      const prefix = normalizePrefix(data.prefix || "")
+      const length = Math.max(4, Math.min(24, data.length || 8))
+      const count = Math.max(1, Math.min(100_000, data.count || 100))
+      // Create batch
+      const batchId = crypto.randomUUID()
+      await db
+        .insert(batch)
+        .values({
+          id: batchId,
+          name,
+          prefix,
+          codeLength: length,
+          quantity: count,
+          createdBy: "system",
+          status: "pending",
+        })
+
+      const chunkSize = 1000
+      for (let i = 0; i < count; i += chunkSize) {
+        const size = Math.min(chunkSize, count - i)
+        const values = Array.from({ length: size }).map(() => ({
+          id: crypto.randomUUID(),
+          batchId,
+          code: generateCode(prefix, length),
+          status: "new",
+        }))
+        await db.insert(promoCode).values(values)
+        await job.updateProgress(Math.round(((i + size) / count) * 100))
+      }
+
+      await db.update(batch).set({ status: "completed" }).where(eq(batch.id, batchId))
+      return { batchId }
+    },
+    { concurrency: 2 }
+  )
+  worker.on("error", (e) => console.error("[generate-worker] error", e))
+  globalThis.__promo_generate_worker__ = true
+}

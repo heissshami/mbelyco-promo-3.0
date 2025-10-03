@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, boolean, integer } from "drizzle-orm/pg-core"
+import { index, uniqueIndex } from "drizzle-orm/pg-core"
 
 // Core Better Auth tables (minimal set used by email/password sessions)
 export const user = pgTable("user", {
@@ -44,3 +45,45 @@ export const account = pgTable("account", {
   createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow().notNull(),
 })
+
+// Promo batches table: groups generated or imported codes
+export const batch = pgTable(
+  "batch",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description"),
+    createdBy: text("created_by").notNull(),
+    status: text("status").notNull().default("pending"), // pending | completed | failed | archived
+    codeLength: integer("code_length"),
+    quantity: integer("quantity"),
+    prefix: text("prefix"),
+    suffix: text("suffix"),
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow().notNull(),
+  },
+  (table) => ({
+    nameIdx: index("batch_name_idx").on(table.name),
+  })
+)
+
+// Promo codes table: stores individual codes
+export const promoCode = pgTable(
+  "promo_code",
+  {
+    id: text("id").primaryKey(),
+    code: text("code").notNull(),
+    batchId: text("batch_id").notNull(),
+    status: text("status").notNull().default("new"), // new | issued | redeemed | invalid
+    metadata: text("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow().notNull(),
+    redeemedAt: timestamp("redeemed_at", { withTimezone: false }),
+    verifiedAt: timestamp("verified_at", { withTimezone: false }),
+  },
+  (table) => ({
+    codeUnique: uniqueIndex("promo_code_code_unique").on(table.code),
+    codeIdx: index("promo_code_code_idx").on(table.code),
+    batchIdx: index("promo_code_batch_idx").on(table.batchId),
+  })
+)
