@@ -28,6 +28,7 @@ export function GenerateCodesForm() {
 
   const [jobId, setJobId] = useState<string | null>(null)
   const [progress, setProgress] = useState<number | null>(null)
+  const [progressOpen, setProgressOpen] = useState(false)
 
   // Date picker popover state
   const [dateOpen, setDateOpen] = useState(false)
@@ -129,7 +130,10 @@ export function GenerateCodesForm() {
       body: JSON.stringify(payload),
     })
     const data = await res.json()
-    if (res.ok) setJobId(data.jobId)
+    if (res.ok) {
+      setJobId(data.jobId)
+      setProgressOpen(true)
+    }
     else setError(data.error || "Error creating job")
     setSubmitting(false)
   }
@@ -305,9 +309,39 @@ export function GenerateCodesForm() {
               <Button id="cancel_button" type="button" variant="secondary" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button id="generate_button" type="submit" disabled={submitting}>
-                {submitting ? "Generating..." : "Generate"}
-              </Button>
+              <Popover open={progressOpen} onOpenChange={setProgressOpen}>
+                <PopoverTrigger asChild>
+                  <Button id="generate_button" type="submit" disabled={submitting} aria-expanded={progressOpen} aria-controls="generate_progress_popover">
+                    {submitting ? "Generating..." : "Generate"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent id="generate_progress_popover" className="w-80">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Batch Generation</div>
+                    {jobId && (
+                      <div className="text-xs text-muted-foreground">Job ID: {jobId}</div>
+                    )}
+                    <div className="h-2 w-full rounded bg-muted">
+                      <div
+                        className="h-2 rounded bg-primary transition-all"
+                        style={{ width: `${Math.max(0, Math.min(progress ?? 0, 100))}%` }}
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={progress ?? 0}
+                        aria-label="Generation progress"
+                      />
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {progress == null ? "Waiting for job to start..." : `${progress}% complete`}
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <Button type="button" size="sm" variant="secondary" onClick={() => setProgressOpen(false)}>Hide</Button>
+                      <Button type="button" size="sm" onClick={() => router.push("/dashboard/batches")}>View Batches</Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </form>
           {jobId && (

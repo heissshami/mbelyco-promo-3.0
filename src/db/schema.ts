@@ -67,6 +67,28 @@ export const batch = pgTable(
   })
 )
 
+// Legacy/alternate table name mapping to support existing data
+export const legacyBatch = pgTable(
+  "batches",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description"),
+    totalCodes: integer("total_codes"),
+    amountPerCode: text("amount_per_code"),
+    currency: text("currency"),
+    expirationDate: timestamp("expiration_date", { withTimezone: false }),
+    assignedUser: text("assigned_user"),
+    status: text("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow().notNull(),
+    redeemedCount: integer("redeemed_count"),
+  },
+  (table) => ({
+    nameIdx: index("batches_name_idx").on(table.name),
+  })
+)
+
 // Promo codes table: stores individual codes
 export const promoCode = pgTable(
   "promo_code",
