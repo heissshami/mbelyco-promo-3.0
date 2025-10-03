@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
       }
 
       const origin = url.origin
-      const res = await fetch(`${origin}/api/auth/session`, {
+      const res = await fetch(`${origin}/api/auth/get-session`, {
         headers: { cookie: cookieHeader },
       })
       if (!res.ok) {

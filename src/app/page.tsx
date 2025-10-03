@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 
 export default async function Home() {
   // Server-side entry point: determine destination based on session cookie
-  const sessionToken = cookies().get("better-auth.session_token")?.value
+  const sessionToken = (await cookies()).get("better-auth.session_token")?.value
 
   // If no session cookie, go to login
   if (!sessionToken) {
@@ -12,7 +12,7 @@ export default async function Home() {
 
   // Validate session via Better Auth API to prevent forged cookies
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/auth/session`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/auth/get-session`, {
       headers: { cookie: `better-auth.session_token=${sessionToken}` },
       cache: "no-store",
     })

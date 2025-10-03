@@ -1,5 +1,7 @@
 "use client"
 
+import * as React from "react"
+import { signOut } from "@/lib/auth-client"
 import {
   BadgeCheck,
   Bell,
@@ -40,6 +42,21 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const [loggingOut, setLoggingOut] = React.useState(false)
+
+  const handleLogout = async () => {
+    if (loggingOut) return
+    setLoggingOut(true)
+    try {
+      await signOut()
+      // Hard navigation avoids client-side transition fetch edge cases
+      window.location.assign("/login")
+    } catch (e) {
+      console.error("Logout failed:", e)
+    } finally {
+      setLoggingOut(false)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -102,9 +119,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} disabled={loggingOut}>
               <LogOut />
-              Log out
+              {loggingOut ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
