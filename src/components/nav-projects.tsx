@@ -1,13 +1,6 @@
 "use client"
 
-import {
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
-  ChevronRight,
-  type LucideIcon,
-} from "lucide-react"
+import { Folder, Forward, MoreHorizontal, Trash2, type LucideIcon } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -16,11 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+// Removed Collapsible usage for "More" section
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -28,9 +17,6 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
 
@@ -86,35 +72,7 @@ export function NavProjects({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <Collapsible asChild className="group/collapsible">
-          <SidebarMenuItem>
-            <CollapsibleTrigger asChild>
-              <SidebarMenuButton>
-                <MoreHorizontal className="text-sidebar-foreground/70" />
-                <span>More</span>
-                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-              </SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarMenuSub>
-                <SidebarMenuSubItem>
-                  <SidebarMenuSubButton asChild>
-                    <a href="/dashboard/more/verify-codes">
-                      <span>Verify Codes</span>
-                    </a>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-                <SidebarMenuSubItem>
-                  <SidebarMenuSubButton asChild>
-                    <a href="/dashboard/more/import-codes">
-                      <span>Import Codes</span>
-                    </a>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              </SidebarMenuSub>
-            </CollapsibleContent>
-          </SidebarMenuItem>
-        </Collapsible>
+        {/* Removed "More" collapsible and submenus per request */}
       </SidebarMenu>
     </SidebarGroup>
   )
