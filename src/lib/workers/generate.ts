@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import { batch, promoCode } from "@/db/schema"
-import { createWorker } from "@/lib/queue"
+import { createWorker, isQueueEnabled } from "@/lib/queue"
 import { generateCode, normalizePrefix } from "@/lib/promo"
 import { eq } from "drizzle-orm"
 import crypto from "crypto"
@@ -19,6 +19,7 @@ declare global {
 }
 
 export function ensureGenerateWorker() {
+  if (!isQueueEnabled()) return
   if (globalThis.__promo_generate_worker__) return
   const { worker } = createWorker<GenerateJob>(
     "generate",
@@ -28,6 +29,9 @@ export function ensureGenerateWorker() {
       const prefix = normalizePrefix(data.prefix || "")
       const length = Math.max(4, Math.min(24, data.length || 8))
       const count = Math.max(1, Math.min(100_000, data.count || 100))
+      const metadata = (data.metadata ?? null) || null
+      const expiresAt = (data.expiresAt ?? null) || null
+      const description = expiresAt ? `Expires at: ${expiresAt}` : undefined
       // Create batch
       const batchId = crypto.randomUUID()
       await db
@@ -35,6 +39,7 @@ export function ensureGenerateWorker() {
         .values({
           id: batchId,
           name,
+          description,
           prefix,
           codeLength: length,
           quantity: count,
@@ -50,6 +55,7 @@ export function ensureGenerateWorker() {
           batchId,
           code: generateCode(prefix, length),
           status: "new",
+          metadata,
         }))
         await db.insert(promoCode).values(values)
         await job.updateProgress(Math.round(((i + size) / count) * 100))
@@ -60,6 +66,6 @@ export function ensureGenerateWorker() {
     },
     { concurrency: 2 }
   )
-  worker.on("error", (e) => console.error("[generate-worker] error", e))
+  worker?.on("error", (e) => console.error("[generate-worker] error", e))
   globalThis.__promo_generate_worker__ = true
 }
