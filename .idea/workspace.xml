@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d9d0991b-0631-437b-8b93-c6d454cfe9b4" name="Changes" comment="MBELYCO Promo 3.0 (Initialization).">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/favicon.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/login-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/login-form.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +87,7 @@
       <workItem from="1759274616514" duration="1094000" />
       <workItem from="1759309746800" duration="1157000" />
       <workItem from="1759438476846" duration="1898000" />
+      <workItem from="1759505414937" duration="2357000" />
     </task>
     <task id="LOCAL-00001" summary="MBELYCO Promo 3.0 (Initialization).">
       <option name="closed" value="true" />
