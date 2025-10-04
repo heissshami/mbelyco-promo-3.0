@@ -36,6 +36,7 @@ export default function PromoCodesPage() {
     { label: "Active", value: "active" },
     { label: "Used", value: "used" },
     { label: "Redeemed", value: "redeemed" },
+    { label: "Reported", value: "reported" },
     { label: "Expired", value: "expired" },
     { label: "Blocked", value: "blocked" },
   ]
@@ -118,6 +119,7 @@ export default function PromoCodesPage() {
                         active: "active",
                         used: "used",
                         redeemed: "redeemed",
+                        reported: "reported",
                         expired: "expired",
                         blocked: "blocked",
                       }

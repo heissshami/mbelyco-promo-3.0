@@ -96,7 +96,7 @@ export const promoCode = pgTable(
     id: text("id").primaryKey(),
     code: text("code").notNull(),
     batchId: text("batch_id").notNull(),
-    status: text("status").notNull().default("new"), // new | issued | redeemed | invalid
+    status: text("status").notNull().default("active"), // active | used | redeemed | reported | expired | blocked
     metadata: text("metadata"),
     createdAt: timestamp("created_at", { withTimezone: false }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow().notNull(),

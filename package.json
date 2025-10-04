@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "migrate": "node scripts/migrate.mjs"
+    "migrate": "node scripts/migrate.mjs",
+    "fix-statuses": "node scripts/fix-statuses.mjs",
+    "status-counts": "node scripts/status-counts.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

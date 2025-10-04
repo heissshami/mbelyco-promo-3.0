@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useMemo, useState, useLayoutEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
+import { usePromoCodesStore } from "@/hooks/use-promo-codes"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +15,7 @@ import { Calendar as CalendarIcon } from "lucide-react"
 
 export function GenerateCodesForm() {
   const router = useRouter()
+  const invalidate = usePromoCodesStore((s) => s.invalidate)
 
   // State aligned with legacy JSON spec
   const [batchName, setBatchName] = useState("")
@@ -169,10 +171,14 @@ export function GenerateCodesForm() {
     setJobId(null)
     setProgress(null)
     setError(null)
+    // Refresh table data when cancelled to reflect any state reset
+    invalidate()
   }
 
   function onClose() {
     router.push("/dashboard")
+    // Invalidate to refresh table when returning to dashboard
+    invalidate()
   }
 
   return (

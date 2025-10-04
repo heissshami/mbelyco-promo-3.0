@@ -63,7 +63,7 @@ export function ensureGenerateWorker() {
           id: crypto.randomUUID(),
           batchId,
           code: useLegacy ? generateLegacyCode() : generateCode(prefix, length),
-          status: "new",
+          status: "active",
           metadata,
         }))
         await db.insert(promoCode).values(values)

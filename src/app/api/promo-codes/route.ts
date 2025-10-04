@@ -18,22 +18,17 @@ type ApiCodeItem = {
 function mapStatusFilter(value: string): string | null {
   const v = value?.toLowerCase()
   if (!v) return null
-  // Legacy → internal mapping
-  // active → new, used → issued, redeemed → redeemed, expired → (not modeled), blocked → invalid
+  // Canonical statuses: active | used | redeemed | reported | expired | blocked
   switch (v) {
     case "active":
-      return "new"
     case "used":
-      return "issued"
     case "redeemed":
-      return "redeemed"
+    case "reported":
     case "expired":
-      return "expired" // not modeled; will yield zero
     case "blocked":
-      return "invalid"
-    default:
-      // Allow direct internal statuses too
       return v
+    default:
+      return null
   }
 }
 
@@ -51,7 +46,7 @@ export async function GET(req: Request) {
       whereClauses.push(ilike(promoCode.code, `%${search}%`))
     }
     const mappedStatus = mapStatusFilter(status)
-    if (mappedStatus && mappedStatus !== "expired") {
+    if (mappedStatus) {
       whereClauses.push(eq(promoCode.status, mappedStatus))
     }
     const whereExpr = whereClauses.length > 0 ? and(...whereClauses) : undefined
@@ -71,7 +66,7 @@ export async function GET(req: Request) {
       .from(promoCode)
       .where(baseWhereExpr as any)
       .groupBy(promoCode.status)
-    let byInternal: Record<string, number> = Object.fromEntries(grouped.map((g) => [g.s, Number((g as any).value ?? 0)]))
+    let byInternal: Record<string, number> = Object.fromEntries(grouped.map((g) => [String((g as any).s).toLowerCase(), Number((g as any).value ?? 0)]))
     let allRows = await db.select({ value: sql<number>`count(*)` }).from(promoCode).where(baseWhereExpr as any)
     let allCount = Number(allRows[0]?.value ?? 0)
 
@@ -132,18 +127,11 @@ export async function GET(req: Request) {
           .from(legacyPromoCode)
           .where((search && hasCode ? ilike(legacyPromoCode.code, `%${search}%`) : undefined) as any)
           .groupBy(legacyPromoCode.status)
-        // Project legacy counts into internal categories
-        const legacyMap: Record<string, string> = {
-          active: "new",
-          used: "issued",
-          redeemed: "redeemed",
-          expired: "expired",
-          blocked: "invalid",
-        }
+        // Legacy already uses desired labels mostly; include reported if present
         const byLegacy: Record<string, number> = Object.fromEntries(grouped.map((g) => [g.s, Number((g as any).value ?? 0)]))
         byInternal = {}
         for (const [k, v] of Object.entries(byLegacy)) {
-          const mapped = legacyMap[k?.toLowerCase()] ?? k?.toLowerCase()
+          const mapped = String(k ?? "").toLowerCase()
           byInternal[mapped] = (byInternal[mapped] ?? 0) + v
         }
       } else {
@@ -192,13 +180,11 @@ export async function GET(req: Request) {
           if (meta.currency) currency = String(meta.currency)
         }
       } catch {}
-      // normalize legacy status strings
-      let normalizedStatus = String(row.status ?? "")
-      const s = normalizedStatus.toLowerCase()
-      if (s === "active") normalizedStatus = "new"
-      else if (s === "used") normalizedStatus = "issued"
-      else if (s === "blocked") normalizedStatus = "invalid"
-      // keep redeemed/expired as-is (expired will show zero in counters)
+      // normalize to canonical labels (keep legacy labels as-is)
+      let normalizedStatus = String(row.status ?? "").toLowerCase()
+      if (normalizedStatus === "new") normalizedStatus = "active"
+      else if (normalizedStatus === "issued") normalizedStatus = "used"
+      else if (normalizedStatus === "invalid") normalizedStatus = "blocked"
       return {
         id: row.id,
         code: row.code,
@@ -218,15 +204,12 @@ export async function GET(req: Request) {
       total,
       counts: {
         all: allCount,
-        active: (byInternal["new"] ?? 0),
-        used: (byInternal["issued"] ?? 0),
+        active: (byInternal["active"] ?? 0),
+        used: (byInternal["used"] ?? 0),
         redeemed: (byInternal["redeemed"] ?? 0),
-        expired: 0,
-        blocked: (byInternal["invalid"] ?? 0),
-        // Also expose internals for future UI needs
-        new: (byInternal["new"] ?? 0),
-        issued: (byInternal["issued"] ?? 0),
-        invalid: (byInternal["invalid"] ?? 0),
+        reported: (byInternal["reported"] ?? 0),
+        expired: (byInternal["expired"] ?? 0),
+        blocked: (byInternal["blocked"] ?? 0),
       },
       items,
     })
